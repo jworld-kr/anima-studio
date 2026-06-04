@@ -55,9 +55,9 @@ export function Pain() {
           align="left"
           title={
             <>
-              작은 브랜드의 콘텐츠는
+              우리 브랜드의 콘텐츠는
               <br />
-              왜 늘 같은 자리에서 막힐까요?
+              왜 늘 '그저 그런 홍보 글'로 끝날까요?
             </>
           }
           description="이 중 하나라도 익숙하다면, Anima가 필요한 시점입니다."
