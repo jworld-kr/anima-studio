@@ -1,16 +1,34 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+const SITE_TITLE = "Anima | 광고대행사 1/10 비용으로 두는 브랜드 전담 에디터";
+const SITE_DESCRIPTION =
+  "오글거리는 인스타 감성, 알맹이 없는 AI 양산형 글은 이제 그만. 완벽한 말맛과 철학을 담은 1인칭 구어체로 끈끈한 팬덤을 모으는 스레드 콘텐츠 솔루션, Anima 스튜디오.";
+
 export const metadata: Metadata = {
-  title: "Anima Studio for Thread — 페르소나 기반 콘텐츠 스튜디오",
-  description:
-    "로고 너머의 브랜드. Anima는 브랜드의 페르소나를 빚고, 그 페르소나로 Thread 콘텐츠를 만들어내는 스튜디오입니다.",
-  metadataBase: new URL("https://anima.studio"),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  metadataBase: new URL("https://anima.oursmartlife.kr"),
   openGraph: {
-    title: "Anima Studio for Thread — 페르소나 기반 콘텐츠 스튜디오",
-    description: "로고 너머의 브랜드. 페르소나로 시작하는 Thread 콘텐츠.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     type: "website",
     locale: "ko_KR",
+    siteName: "Anima 스튜디오",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 633,
+        alt: "Anima Studio for Thread",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: ["/og-image.png"],
   },
 };
 
