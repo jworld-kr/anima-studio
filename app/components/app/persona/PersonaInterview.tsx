@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Fragment } from "react";
 import { ArrowLeft, ArrowRight, Sparkles, Check, User2, Building2 } from "lucide-react";
 import { supabase } from "@/app/lib/supabase";
 import { Button } from "@/app/components/ui/Button";
@@ -18,6 +18,19 @@ import {
   isAnswered,
 } from "@/app/lib/persona-interview";
 import type { WorldBuilding } from "@/app/types";
+
+/** assistNote의 **굵게** 구간을 <strong>으로, 나머지는 그대로 렌더 (줄바꿈은 whitespace-pre-line이 처리). */
+function renderAssistNote(text: string) {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith("**") && part.endsWith("**") ? (
+      <strong key={i} className="font-semibold text-anima-700">
+        {part.slice(2, -2)}
+      </strong>
+    ) : (
+      <Fragment key={i}>{part}</Fragment>
+    )
+  );
+}
 
 interface Props {
   onComplete: (result: {
@@ -258,9 +271,22 @@ function QuestionBlock({
         )}
       </h3>
       {("hint" in q && q.hint) && (
-        <p className="text-[13px] text-ink-500 leading-[1.65] mb-4 break-keep">
+        <p className="text-[13px] text-ink-500 leading-[1.65] mb-3 break-keep whitespace-pre-line">
           {q.hint}
         </p>
+      )}
+
+      {"assistNote" in q && (q as MultiChoiceQuestion).assistNote && (
+        <div className="mb-5 flex items-start gap-2.5 rounded-[10px] border border-anima-200 bg-anima-50/70 px-3.5 py-3">
+          <Sparkles
+            size={15}
+            strokeWidth={1.75}
+            className="text-anima-600 shrink-0 mt-0.5"
+          />
+          <p className="text-[12.5px] text-anima-700 leading-[1.7] break-keep whitespace-pre-line">
+            {renderAssistNote((q as MultiChoiceQuestion).assistNote!)}
+          </p>
+        </div>
       )}
 
       {q.kind === "mode" && (

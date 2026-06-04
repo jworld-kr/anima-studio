@@ -35,6 +35,8 @@ export interface MultiChoiceQuestion {
   minSelected?: number;
   maxSelected?: number;
   optional?: boolean;
+  /** 강조 박스로 렌더되는 안내(예: 비워두면 AI가 채워준다). **굵게** 지원. */
+  assistNote?: string;
 }
 
 export interface TextExampleGroup {
@@ -495,8 +497,10 @@ const EXPRESSIONS: MultiChoiceQuestion = {
   id: "expressions",
   kind: "multi",
   question: "내 피드에 꼭 녹이고 싶은 문장 스타일이 있나요?",
-  hint: "자주 쓰는 문구나 말버릇을 골라주세요. Anima가 이를 바탕으로 스레드(Threads) 특유의 자연스러운 구어체 말투를 정밀 세팅합니다. (다중 선택 가능)",
-  minSelected: 3,
+  hint: "자주 쓰는 문구나 말버릇을 골라주세요. (다중 선택 가능)",
+  assistNote:
+    "고르기 어렵다면 **그냥 비워두고 넘어가도 괜찮아요.**\nAnima가 앞선 답변을 분석해 어울리는 말투 표현을 **4~5개 알아서 채워드려요.**",
+  optional: true,
   allowCustom: true,
   customHint: "💡 나만 쓰는 독특한 표현이나 자주 붙이는 문장 부호가 있나요? 카톡이나 댓글을 쓸 때 나도 모르게 자주 사용하는 단어와 문구를 편하게 적어주세요. 쉼표(,)로 구분해서 툭툭 던져주시면 좋습니다.",
   customExamples: ["~라는 뜻", "ㅠㅠ", "🔥", "암튼", "개추"],

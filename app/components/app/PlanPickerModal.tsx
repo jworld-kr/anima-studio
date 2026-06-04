@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { X, Check, ArrowRight } from "lucide-react";
 import { Button } from "../ui/Button";
@@ -75,9 +76,13 @@ export function PlanPickerModal({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  // 포털은 클라이언트에서만 (SSR 시 document 없음)
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  return (
+  if (!open || !mounted) return null;
+
+  return createPortal(
     <div
       className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center sm:p-6 animate-fade-in"
       role="dialog"
@@ -255,6 +260,7 @@ export function PlanPickerModal({
           </p>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
