@@ -1524,7 +1524,7 @@ export function FAQ() {
                     className="group border-b border-ink-200"
                   >
                     <summary className="flex items-start justify-between gap-6 py-5 lg:py-6 cursor-pointer list-none hover:bg-ink-50/40 transition-colors -mx-2 px-2 rounded-[6px]">
-                      <h3 className="font-display text-[18px] lg:text-[21px] text-ink-800 tracking-[-0.015em] leading-snug">
+                      <h3 className="font-display text-[18px] lg:text-[21px] text-ink-800 tracking-[-0.015em] leading-snug break-keep">
                         {f.q}
                       </h3>
                       <ChevronDown
@@ -1533,7 +1533,7 @@ export function FAQ() {
                         className="mt-1.5 shrink-0 text-ink-400 transition-transform duration-200 group-open:rotate-180"
                       />
                     </summary>
-                    <div className="pb-6 -mt-1 text-[14.5px] lg:text-[15px] text-ink-600 leading-[1.8] max-w-[680px]">
+                    <div className="pb-6 -mt-1 text-[14.5px] lg:text-[15px] text-ink-600 leading-[1.8] max-w-[680px] break-keep">
                       {renderAnswer(f.a)}
                     </div>
                   </details>
