@@ -50,9 +50,10 @@ export function PublishPanel({
   }, [onClose]);
 
   const buildIntentUrl = (text: string) => {
-    const url = new URL(INTENT_URL);
-    url.searchParams.set("text", text);
-    return url.toString();
+    // encodeURIComponent로 공백을 %20으로 인코딩한다.
+    // URLSearchParams는 공백을 '+'로 인코딩하는데, Threads 작성창이
+    // 이 '+'를 공백으로 복원하지 않고 그대로 글자로 넣어버리는 문제가 있다.
+    return `${INTENT_URL}?text=${encodeURIComponent(text)}`;
   };
 
   const writeClipboard = async (text: string) => {
