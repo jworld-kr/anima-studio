@@ -68,7 +68,7 @@ export function Hero() {
                 무료로 시작하기
               </Button>
             </Link>
-            <a href="#how">
+            <a href="#preview">
               <Button variant="ghost" size="lg">
                 1분 만에 작동 방식 보기
               </Button>
@@ -81,7 +81,7 @@ export function Hero() {
         </div>
 
         {/* App preview */}
-        <div className="relative">
+        <div id="preview" className="relative scroll-mt-24">
           <div
             aria-hidden
             className="absolute -inset-x-10 -inset-y-6 rounded-[32px] -z-10"
