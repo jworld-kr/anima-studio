@@ -84,7 +84,19 @@ export function PublishPanel({
     // Also drop it on the clipboard, just in case the intent URL is blocked.
     await writeClipboard(firstText);
     const url = buildIntentUrl(firstText);
-    window.open(url, "_blank", "noopener,noreferrer");
+
+    const isMobile =
+      typeof navigator !== "undefined" &&
+      /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      // Top-level navigation lets iOS/Android Universal Links hand off to the
+      // installed Threads app. window.open(_blank) just stays in the browser.
+      // When the app is installed the OS opens it and this page stays put;
+      // otherwise it falls back to the Threads web composer.
+      window.location.href = url;
+    } else {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
     setFirstLaunched(true);
     setCompletedIdx((prev) => {
       const next = new Set(prev);
@@ -92,7 +104,9 @@ export function PublishPanel({
       return next;
     });
     toast({
-      description: "Threads 작성창을 새 탭에서 열었습니다.",
+      description: isMobile
+        ? "Threads 작성창을 열었습니다."
+        : "Threads 작성창을 새 탭에서 열었습니다.",
       variant: "success",
       duration: 2400,
     });
@@ -202,7 +216,7 @@ export function PublishPanel({
             {firstLaunched && (
               <p className="mt-3 text-[12px] text-anima-700 flex items-center gap-1.5">
                 <Check size={12} strokeWidth={2} className="text-anima-500" />
-                새 탭에서 Threads가 열렸습니다. 작성창에 첫 포스트가 채워졌어요.
+                Threads 작성창이 열리고 첫 포스트가 채워졌어요.
               </p>
             )}
           </section>

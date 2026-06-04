@@ -1081,16 +1081,16 @@ function ManageSection(props: {
         {filtered.map((topic) => (
           <Card
             key={topic.id}
-            className="group flex items-center gap-3 px-4 py-3.5"
+            className="group flex flex-col sm:flex-row sm:items-center gap-3 px-4 py-3.5"
           >
-            <span className="w-1 self-stretch rounded-full bg-anima-200 group-hover:bg-anima-400 transition-colors" />
+            <span className="hidden sm:block w-1 self-stretch rounded-full bg-anima-200 group-hover:bg-anima-400 transition-colors" />
             <div className="flex-1 min-w-0">
-              <p className="text-[14px] text-ink-800 leading-[1.55] mb-1">
+              <p className="text-[14px] text-ink-800 leading-[1.55] mb-1 break-keep">
                 {topic.title}
               </p>
               <Badge variant="muted">{topic.category}</Badge>
             </div>
-            <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-center gap-1.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
               <Button
                 size="sm"
                 variant="secondary"
