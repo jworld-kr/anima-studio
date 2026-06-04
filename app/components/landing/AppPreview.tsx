@@ -14,55 +14,55 @@ import {
   Trash2,
 } from "lucide-react";
 
-const TOPIC = "3년 카페 운영하면서 깨달은, 손님이 절대 모르는 원두의 진실";
+const TOPIC = "에스프레소 머신 없이 필터커피만 고집한 5년, 느림이 무기가 된 이야기";
 
 const POSTS = [
   {
     order: 1,
-    text: `3년 카페 하면서 깨달은 거.\n\n손님 80%는 원두 살 때 가장 중요한 걸 안 봄.\n\n산지도, 가격도 아님 ㅋㅋ`,
+    text: `나 에스프레소 머신 없는 카페 열겠다고 했을 때,\n다들 미쳤다고 말렸잖아.\n\n회전율 안 나와서 석 달 안에 무조건 망한다고.\n\n근데 난 그냥 손님이랑 눈 마주치면서\n천천히 커피 내리는 그 속도가 참 좋았어.\n\n뻔한 효율 때문에\n내 철학을 버리고 싶진 않았거든.`,
   },
   {
     order: 2,
-    text: `정답은 로스팅 날짜.\n\n1주일 지난 원두랑 한 달 지난 원두는 진짜 완전 다른 음료라고 보면 됨.\n\n근데 마트나 온라인에서 파는 원두 중 60%는 로스팅 날짜 표기 안 함.`,
+    text: `당연히 첫 달 매출은 진짜 처참했지.\n하루에 딱 다섯 잔 판 날도 있었으니까.\n\n근데 신기한 건,\n그렇게 느리게 내린 커피 한 잔을 마시고 간 사람들은\n다음 주에 꼭 친구 손을 잡고 다시 오더라고.\n\n느린 게 단점인 줄 알았는데,\n오히려 우리만의 뾰족한 무기가 된 거야.`,
   },
   {
     order: 3,
-    text: `원두 살 때 무조건 확인하기:\n\n✅ 로스팅 날짜 (없으면 의심)\n✅ 산 후 5~10일 안에 마시기\n✅ 못 마실 양은 차라리 100g만 사기\n\n스친들은 원두 살 때 뭐 제일 먼저 봐? 댓글로 알려줘 🙏`,
+    text: `다들 너무 빠르게만 가려니까\n쉽게 지치는 게 아닐까?\n\n가끔은 일부러 속도를 조금 늦춰봐야\n비로소 보이는 것들이 있거든.\n단골들 표정이나 오늘 날씨 같은 소중한 것들 말이야.\n\n너희 브랜드나 일상에도\n일부러 조금 늦춰둔 너만의 속도가 있어?`,
   },
 ];
 
 const REPLIES = [
   {
-    handle: "soohyun_brews",
-    avatar: "S",
+    handle: "coffee_traveler",
+    avatar: "C",
     avatarBg: "#b89580",
     time: "2시간",
-    text: "와 진짜 로스팅 날짜 한 번도 안 봤네요... 다음엔 꼭 확인해볼게요 🙇‍♀️",
-    likes: 89,
+    text: "첫 줄 읽자마자 소름 돋았어 ㅋㅋ 여기 갈 때마다 왜 마음이 편했는지 이제야 알았네",
+    likes: 42,
   },
   {
-    handle: "minji.kafee",
+    handle: "min_zi_log",
     avatar: "M",
     avatarBg: "#a37e8b",
-    time: "1시간",
-    text: "60%가 표기 안 한다는 거 충격이에요,, 사장님 글 덕에 오늘 원두 다시 보러 갑니다 ☕️",
-    likes: 47,
+    time: "4시간",
+    text: "나도 프리랜서 시작하고 너무 늦는 것 같아 불안했는데,, 이 글 보니까 엄청 위로된다 ㅠㅠ",
+    likes: 28,
   },
   {
-    handle: "everyday_drip",
-    avatar: "E",
+    handle: "zero_waste_life",
+    avatar: "Z",
     avatarBg: "#6b8aa8",
-    time: "47분",
-    text: "100g씩만 사라는 거 진짜 공감 ㅋㅋ 저도 큰 거 사놓고 한 달 묵힌 적 있음 ㅠ",
-    likes: 32,
+    time: "5시간",
+    text: "진짜 대공감. 요즘 효율 얘기뿐이라 지쳤는데 이런 고집 있는 가게들이 더 오래 가야됨",
+    likes: 56,
   },
   {
-    handle: "kim_baker",
-    avatar: "K",
+    handle: "weekend_hunter",
+    avatar: "W",
     avatarBg: "#7a8b6d",
-    time: "23분",
-    text: "다음 글 언제 올라와요? 산지별 차이도 궁금해요!!",
-    likes: 18,
+    time: "7시간",
+    text: "고생많았네,, 스친이는 근데 첫 달 버틸 때 멘탈 관리는 어떻게 했어? 꿀팁 좀",
+    likes: 19,
   },
 ];
 
@@ -219,7 +219,7 @@ function AnimaSide() {
         <span className="w-2.5 h-2.5 rounded-full bg-ink-200" />
         <span className="w-2.5 h-2.5 rounded-full bg-ink-200" />
         <span className="ml-4 text-[11px] text-ink-400 tracking-[0.02em] truncate">
-          anima.studio / 반도커피
+          anima.studio / 누크 커피
         </span>
       </div>
 
@@ -230,11 +230,11 @@ function AnimaSide() {
             className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-display text-ink-50 shrink-0"
             style={{ background: "#7a8b6d" }}
           >
-            半
+            N
           </span>
           <div className="min-w-0">
             <p className="text-[12.5px] font-medium text-ink-800 leading-tight">
-              반도커피
+              누크 커피
             </p>
             <p className="text-[10.5px] text-ink-400 leading-tight mt-0.5">
               가게 페르소나 · Thread
@@ -293,7 +293,7 @@ function AnimaSide() {
         {/* Footer */}
         <div className="mt-4 pt-3 border-t border-ink-200/60 flex items-center justify-between">
           <p className="text-[10.5px] text-ink-400 leading-tight">
-            반도커피 페르소나의 톤으로 작성됨
+            누크 커피 페르소나의 톤으로 작성됨
           </p>
           <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-ink-800 text-ink-50 text-[10.5px] font-medium">
             <Send size={10} strokeWidth={1.75} />
@@ -324,7 +324,7 @@ function ThreadsSide() {
         <span className="w-2.5 h-2.5 rounded-full bg-ink-200" />
         <span className="w-2.5 h-2.5 rounded-full bg-ink-200" />
         <span className="ml-4 text-[11px] text-ink-400 tracking-[0.02em] truncate">
-          threads.com / @bando.coffee
+          threads.com / @nook.coffee
         </span>
       </div>
 
@@ -335,12 +335,12 @@ function ThreadsSide() {
             className="w-9 h-9 rounded-full flex items-center justify-center text-[14px] font-display text-ink-50 shrink-0"
             style={{ background: "#7a8b6d" }}
           >
-            半
+            N
           </span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
               <p className="text-[13px] font-semibold text-ink-800 leading-tight">
-                bando.coffee
+                nook.coffee
               </p>
               <CheckCircle2
                 size={12}
@@ -353,7 +353,7 @@ function ThreadsSide() {
               </span>
             </div>
             <p className="text-[11px] text-ink-400 leading-tight mt-0.5">
-              반도커피 · 1인 카페 · 마이크로 로스터리
+              누크 커피 · 성수동 필터커피 카페
             </p>
           </div>
           <MoreHorizontal
