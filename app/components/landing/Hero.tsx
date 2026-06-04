@@ -46,6 +46,7 @@ export function Hero() {
           <div className="max-w-[600px] text-[15px] sm:text-[16px] text-ink-500 leading-[1.8] mb-10 break-keep">
             <p>
               수백만 원 브랜딩 컨설팅 없이도{" "}
+              <br className="sm:hidden" />
               <span className="text-ink-700 font-medium">
                 우리 브랜드만의 고유한 색깔
               </span>

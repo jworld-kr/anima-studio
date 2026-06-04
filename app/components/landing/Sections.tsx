@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment, type ReactNode } from "react";
 import {
   ArrowRight,
   Check,
@@ -26,19 +26,22 @@ const PAINS = [
   {
     n: "01",
     title: "소재 고갈",
-    body: "\"오늘 인스타그램, 스레드에 대체 뭐 올리지?\" 매일 밤 하얀 화면 앞에서 커서만 깜빡이고 있다면.",
+    headline: "오늘 스레드에 대체 뭐 올리지?",
+    body: "매일 밤 빈 화면에 커서만 깜빡거리며 시간만 버리고 있다면. 결국 짜내고 짜내다 '오늘도 화이팅!' 같은 영혼 없는 글만 올리고 있다면.",
     icon: PenLine,
   },
   {
     n: "02",
-    title: "들쑥날쑥한 톤",
-    body: "담당자가 바뀌거나 외주를 맡길 때마다 브랜드의 말투와 색깔이 매번 달라진다면.",
+    title: "흔들리는 톤앤매너",
+    headline: "누가 쓰느냐에 따라 브랜드 말투가 달라지네...",
+    body: "내가 쓸 때, 직원이 쓸 때, 외주를 맡길 때마다 브랜드 색깔이 널을 뛰고 있다면. 우리 브랜드만의 고유한 '말맛'과 정체성이 희미해지고 있다면.",
     icon: Shuffle,
   },
   {
     n: "03",
-    title: "뻔한 AI 글",
-    body: "AI 툴을 써봤지만, 영혼 없고 뻔한 '양산형 콘텐츠'만 나와서 결국 다 지워버렸다면.",
+    title: "뻔한 AI 양산형 글",
+    headline: "AI가 쓴 티가 너무 나서 결국 다 지웠어요.",
+    body: "챗GPT를 써봤지만 '현대 사회에서~', '~해보세요!' 같은 오글거리는 번역체와 알맹이 없는 뻔한 글만 뱉어내서 결국 처음부터 다시 쓰느라 지쳤다면.",
     icon: Bot,
   },
 ];
@@ -60,34 +63,55 @@ export function Pain() {
           description="이 중 하나라도 익숙하다면, Anima가 필요한 시점입니다."
         />
 
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-4">
           {PAINS.map((p) => (
             <article
               key={p.n}
-              className="group relative rounded-[16px] border border-ink-200 bg-paper p-7 lg:p-8 overflow-hidden hover:border-ink-300 transition-colors"
+              className="group relative rounded-[18px] border border-ink-200 bg-paper p-7 lg:p-8 overflow-hidden hover:border-ink-300 hover:shadow-[0_16px_48px_rgba(11,10,7,0.07)] transition-all duration-300"
             >
-              <div className="flex items-center justify-between mb-6">
-                <span className="w-11 h-11 rounded-[12px] bg-[rgba(181,86,74,0.08)] border border-[rgba(181,86,74,0.18)] flex items-center justify-center text-[#b5564a]">
-                  <p.icon size={19} strokeWidth={1.6} />
-                </span>
-                <span className="font-mono text-[10.5px] text-ink-300 tabular-nums tracking-[0.12em]">
-                  {p.n}
-                </span>
-              </div>
-              <h3
-                className="font-display text-ink-800 mb-2.5"
+              {/* 배경 워터마크 번호 */}
+              <span
+                aria-hidden
+                className="absolute -top-5 -right-1 font-display text-[110px] leading-none text-ink-100/70 select-none pointer-events-none transition-colors duration-300 group-hover:text-[rgba(95,110,80,0.10)]"
+              >
+                {p.n}
+              </span>
+
+              {/* 아이콘 */}
+              <span className="relative w-12 h-12 rounded-[14px] bg-gradient-to-br from-[rgba(95,110,80,0.16)] to-[rgba(95,110,80,0.03)] border border-[rgba(95,110,80,0.22)] flex items-center justify-center text-anima-600 mb-6 shadow-[0_4px_12px_rgba(95,110,80,0.10)]">
+                <p.icon size={20} strokeWidth={1.6} />
+              </span>
+
+              {/* 카테고리 */}
+              <p className="relative text-[11px] tracking-[0.14em] uppercase text-anima-600/85 font-semibold mb-3">
+                {p.title}
+              </p>
+
+              {/* 인용 헤드라인 */}
+              <p
+                className="relative font-display text-ink-800 mb-3.5 break-keep"
                 style={{
-                  fontSize: "clamp(20px, 1.7vw, 23px)",
-                  lineHeight: 1.3,
-                  letterSpacing: "-0.025em",
+                  fontSize: "clamp(18px, 1.5vw, 21px)",
+                  lineHeight: 1.42,
+                  letterSpacing: "-0.02em",
                   fontWeight: 400,
                 }}
               >
-                {p.title}
-              </h3>
-              <p className="text-[14px] text-ink-500 leading-[1.7] break-keep">
+                <span className="text-anima-500/45 mr-0.5">“</span>
+                {p.headline}
+                <span className="text-anima-500/45">”</span>
+              </p>
+
+              {/* 본문 */}
+              <p className="relative text-[13.5px] text-ink-500 leading-[1.8] break-keep">
                 {p.body}
               </p>
+
+              {/* 하단 강조선 (hover) */}
+              <span
+                aria-hidden
+                className="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-anima-500/60 to-anima-500/10 group-hover:w-full transition-all duration-500"
+              />
             </article>
           ))}
         </div>
@@ -324,6 +348,7 @@ export function PersonaImportance() {
             <>
               <span className="block">
                 내 브랜드의 색깔을 어떻게 정의해야 할지{" "}
+                <br className="sm:hidden" />
                 <span className="text-ink-700 font-medium">
                   더 이상 헤매지 마세요.
                 </span>
@@ -1398,57 +1423,82 @@ interface FaqGroup {
 
 const FAQ_GROUPS: FaqGroup[] = [
   {
-    label: "Anima에 대하여",
+    label: "🌊 Anima에 대하여",
     items: [
       {
-        q: "다른 AI 글쓰기 도구와 무엇이 다른가요?",
-        a: "대부분의 AI 글쓰기 도구는 어휘와 분위기 같은 ‘톤’을 조정하는 데 머무릅니다. Anima는 이름·직업·말투·가치관·일상을 8개 섹션으로 정의해서, 글을 쓰는 사람 자체를 만들어내는 데서 출발합니다. 그래서 같은 주제를 다뤄도 결과물의 깊이가 다릅니다.",
+        q: "다른 AI 글쓰기 툴이랑 뭐가 다른가요?",
+        a: `기존 AI 툴들은 "친근하게 써줘", "전문적으로 써줘"처럼 대충 분위기만 바꾸는 데 그쳐요. 반면 Anima는 이름, 직업, 가치관, 심지어 일상 루틴까지 아예 '인간의 정체성'을 통째로 설계해 두고 글을 쓰기 시작합니다. 챗GPT 특유의 오글거리는 번역체나 알맹이 없는 뻔한 소리가 아니라, 진짜 내 친구가 쓴 것 같은 뾰족한 글이 나오는 이유가 바로 여기에 있습니다.`,
       },
       {
-        q: "페르소나는 꼭 ‘사람’이어야 하나요?",
-        a: "아닙니다. 가게나 브랜드 자체가 페르소나가 될 수도 있습니다. 사장님 본인의 목소리로 운영하는 1인칭 페르소나도 가능하고, ‘우리 가게는…’이나 ‘우리 브랜드는…’ 같은 1인칭으로 말하는 브랜드 페르소나도 가능합니다. 어떤 형태든 한 사람이 쓴 듯한 일관된 글로 이어집니다.",
+        q: "요즘 자동으로 글 올려주는 AI 프로그램도 많던데, 뭐가 다른가요?",
+        a: `Anima는 '질보다 양'으로 피드를 어지럽히는 자동 양산형 매크로 프로그램이 절대 아닙니다. 영혼 없이 긁어온 글로 피드를 도배하는 건 오히려 브랜드 이미지를 갉아먹는 독이 되니까요. Anima의 목표는 단순히 글을 찍어내는 게 아니라, 우리 브랜드만의 독창적인 철학과 스토리를 가장 밀도 높게 녹여내는 것입니다. 사장님은 그저 클릭 몇 번으로 탑티어 에디터가 밤새 고심해 쓴 것 같은 고품질 브랜딩 콘텐츠를 손에 쥐게 됩니다.`,
       },
       {
-        q: "Threads 외에 다른 채널도 지원하나요?",
-        a: "현재는 Threads만 정식 지원합니다. 텍스트 한 편이면 운영되는 채널 특성상, 작은 브랜드가 가장 빠르게 효과를 볼 수 있는 곳이라고 판단했습니다. Shorts, Instagram, Blog 버전은 같은 페르소나 위에서 형식만 바꿔 차차 추가될 예정입니다.",
+        q: "광고 대행사를 쓰거나 에디터를 고용하는 것과 비교하면 어떤가요?",
+        a: `한 달에 수백만 원씩 드는 광고 대행사를 쓰거나 전문 카피라이터를 고용하면 참 좋겠지만, 작은 브랜드에겐 현실적으로 너무 큰 비용이죠. 게다가 대행사가 우리 브랜드의 깊은 속사정이나 철학까지 완벽히 이해하고 글을 쓰기란 불가능에 가깝습니다. **Anima는 우리 가게의 가치관, 사장님의 일상 루틴, 절대 양보할 수 없는 신념까지 완벽히 학습한 '우리 브랜드 전담 수석 에디터'**를 월 몇 만 원으로 곁에 두는 효과를 줍니다. 대행사보다 우리 브랜드를 더 잘 이해하는 똑똑한 러닝메이트를 경험해 보세요.`,
+      },
+      {
+        q: "페르소나는 무조건 '실제 사람'으로만 만들어야 하나요?",
+        a: `아뇨, 전혀요! 가게나 브랜드 자체가 하나의 페르소나가 될 수 있습니다. 사장님 본인의 목소리를 그대로 복제한 1인칭 개인 계정도 좋고, "우리 브랜드는 오늘~"로 시작하는 브랜드 공식 계정 형태도 얼마든지 가능합니다. 어떤 형태든 마치 한 사람이 로그인해서 쭉 써 내려간 듯한 완벽한 일관성을 지켜드려요.`,
+      },
+      {
+        q: "스레드(Threads) 말고 다른 채널도 쓸 수 있나요?",
+        a: `지금은 스레드만 뾰족하게 정식 지원하고 있어요. 인플루언서나 작은 브랜드가 복잡한 이미지 피드 없이, 오직 '말맛' 하나로 가장 빠르게 팬덤을 모을 수 있는 채널이 스레드이기 때문입니다. 하지만 걱정 마세요. 여기서 빌드업한 고유의 페르소나를 그대로 활용해서 인스타 캡션, 블로그, 쇼츠 대본까지 뽑아낼 수 있는 확장 기능을 곧 업데이트할 예정입니다.`,
       },
     ],
   },
   {
-    label: "사용 방법",
+    label: "🛠️ 사용 방법",
     items: [
       {
-        q: "페르소나는 한 번 만들면 끝인가요?",
-        a: "원칙적으로 한 번 정의해두면 그 다음부터는 매일 주제만 입력하면 됩니다. 다만 브랜드가 자라거나 방향이 바뀌면 페르소나도 함께 다듬어 가는 것이 좋습니다. 8개 섹션 모두 언제든 수정할 수 있고, 수정 즉시 다음 콘텐츠부터 새 페르소나로 작동합니다.",
+        q: "페르소나는 한 번 만들면 끝인가요? 수정은 안 되나요?",
+        a: `한 번 잘 세팅해 두면 그다음부터는 매일 아침 '글감 주제'만 툭 던져주시면 됩니다. 하지만 브랜드가 성장하고 방향이 바뀌면 페르소나도 당연히 같이 자라야겠죠? 8개 섹션 모두 언제든지 마음에 들게 수정할 수 있으며, 고치는 즉시 다음 글부터 바뀐 성격이 바로 반영됩니다.`,
       },
       {
-        q: "한 계정에서 여러 브랜드를 운영할 수 있나요?",
-        a: "네. Pro 플랜은 페르소나 3개, Studio 플랜은 10개까지 운영할 수 있습니다. 각 페르소나는 별도의 콘텐츠 히스토리, 발행 기록, 톤 설정을 갖기 때문에 서로 다른 브랜드를 한 곳에서 관리하셔도 톤이 섞이지 않습니다.",
+        q: "한 계정에서 여러 브랜드를 동시에 키울 수 있나요?",
+        a: `네, 가능합니다! Pro 플랜은 최대 3개, Studio 플랜은 10개까지 독립된 페르소나를 운영할 수 있어요. 각 페르소나마다 콘텐츠 히스토리와 말투 설정이 완벽하게 분리되어 작동하기 때문에, 부계정을 여러 개 운영하셔도 톤앤매너가 서로 섞일 걱정이 전혀 없습니다.`,
       },
       {
-        q: "Threads에 자동으로 발행되나요?",
-        a: "발행 버튼을 누르면 Threads 작성창이 열리고 첫 포스트가 자동으로 채워집니다. 이후 포스트들은 한 번의 클릭으로 클립보드에 복사되어 빠르게 붙여넣을 수 있습니다. 마지막 게시 버튼은 사용자 본인이 직접 누르도록 두어, 발행 직전에 한 번 더 검토할 수 있도록 했습니다.",
+        q: "스레드 앱에 자동으로 글이 올라가나요?",
+        a: `생성된 콘텐츠에서 '발행' 버튼을 누르면 스레드 작성 창이 열리면서 첫 줄(오프닝)이 자동으로 채워집니다. 스레드 특성상 이어지는 댓글(타래)들은 화면에서 원클릭으로 클립보드에 복사해 갈 수 있도록 설계해 두었어요. 마지막 최종 업로드 버튼은 사장님이 직접 누르기 때문에, 발행 직전에 한 번 더 검토할 수 있어 안전합니다.`,
       },
     ],
   },
   {
-    label: "요금과 결제",
+    label: "💳 요금과 결제",
     items: [
       {
-        q: "결제는 어떻게 진행되나요?",
-        a: "모든 결제는 토스페이먼츠를 통해 안전하게 처리됩니다. 신용카드, 체크카드, 간편결제(토스페이) 모두 지원합니다. 무료 플랜은 신용카드 등록 없이 바로 시작할 수 있습니다.",
+        q: "결제는 어떤 방식으로 진행되나요?",
+        a: `모든 결제는 토스페이먼츠를 통해 안전하고 확실하게 처리됩니다. 신용카드, 체크카드는 물론 간편결제(토스페이)까지 편하게 이용하실 수 있습니다. 참고로 무료 플랜은 카드 등록 조차 필요 없으니 부담 없이 먼저 써보세요!`,
       },
       {
-        q: "월 콘텐츠 한도를 초과하면 어떻게 되나요?",
-        a: "한도에 도달하면 다음 갱신일까지 새 콘텐츠 생성이 일시 중단됩니다. 이미 만들어둔 콘텐츠 편집과 발행은 그대로 가능합니다. 한도가 자주 초과된다면 상위 플랜으로 업그레이드를 권장드리며, 다운그레이드도 언제든 가능합니다.",
+        q: "이번 달 콘텐츠 생성 한도를 다 쓰면 어떻게 되나요?",
+        a: `이번 달 한도가 똑 떨어지면 다음 결제(갱신)일까지 새 글 생성 기능이 잠시 멈춥니다. 다만 이미 만들어둔 글을 고치거나 발행하는 건 언제든 가능해요. 매달 한도가 조금 부족하다고 느껴지신다면 상위 플랜으로 언제든 업그레이드하실 수 있고, 반대로 다운그레이드도 자유롭습니다.`,
       },
       {
-        q: "구독을 해지하면 만든 페르소나와 콘텐츠는 어떻게 되나요?",
-        a: "해지 후에도 계정은 자동으로 무료 플랜으로 전환되며, 만들어두신 페르소나와 콘텐츠는 그대로 유지됩니다. 다만 페르소나·콘텐츠 한도가 무료 플랜 기준으로 줄어들기 때문에, 한도를 넘는 페르소나는 보관만 되고 새 콘텐츠 생성은 제한됩니다.",
+        q: "구독을 취소하면 제가 만든 페르소나랑 글들은 다 날아가나요?",
+        a: `아뇨, 소중한 자산인데 절대 그냥 지우지 않습니다. 구독을 해지하셔도 계정이 무료 플랜으로 자동 전환될 뿐, 기존에 만들어두신 페르소나와 콘텐츠 기록은 안전하게 보관됩니다. 다만 무료 플랜의 개수 한도를 넘어가는 페르소나는 잠시 '보관(비활성화)' 상태가 되며, 새 글 작성이 제한됩니다. 다시 구독하시면 언제든 그대로 이어서 쓰실 수 있어요.`,
       },
     ],
   },
 ];
+
+/**
+ * 답변 본문의 **굵게** 구간을 <strong>으로 렌더한다.
+ * 화면에 마크업 기호(**)가 그대로 노출되지 않도록 처리.
+ */
+function renderAnswer(text: string): ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) =>
+    part.startsWith("**") && part.endsWith("**") ? (
+      <strong key={i} className="font-semibold text-ink-800">
+        {part.slice(2, -2)}
+      </strong>
+    ) : (
+      <Fragment key={i}>{part}</Fragment>
+    )
+  );
+}
 
 export function FAQ() {
   return (
@@ -1488,7 +1538,7 @@ export function FAQ() {
                       />
                     </summary>
                     <div className="pb-6 -mt-1 text-[14.5px] lg:text-[15px] text-ink-600 leading-[1.8] max-w-[680px]">
-                      {f.a}
+                      {renderAnswer(f.a)}
                     </div>
                   </details>
                 ))}

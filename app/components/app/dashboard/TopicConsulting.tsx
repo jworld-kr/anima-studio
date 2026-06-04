@@ -91,7 +91,7 @@ function GuidebookModal({ onClose }: { onClose: () => void }) {
         onClick={onClose}
         aria-hidden
       />
-      <div className="relative bg-paper border border-ink-200 sm:rounded-[18px] shadow-[0_24px_64px_rgba(11,10,7,0.18)] w-full sm:max-w-[640px] max-h-[92vh] flex flex-col animate-slide-up overflow-hidden break-keep">
+      <div className="relative bg-paper border border-ink-200 rounded-t-[18px] sm:rounded-[18px] shadow-[0_24px_64px_rgba(11,10,7,0.18)] w-full sm:max-w-[640px] max-h-[90dvh] sm:max-h-[92vh] flex flex-col animate-slide-up overflow-hidden break-keep">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 z-10 p-1.5 text-ink-400 hover:text-ink-800 transition-colors"

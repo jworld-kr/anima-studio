@@ -787,13 +787,21 @@ function PageHeader({ channel, accent }: { channel: Channel; accent: string }) {
     <header className="px-6 lg:px-10 pt-8 pb-6 border-b border-ink-200">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
-          <span
-            className="w-9 h-9 rounded-full flex items-center justify-center text-[14px] font-display text-ink-50 shrink-0"
-            style={{ background: accent }}
-            aria-hidden
-          >
-            {channel.name[0] || "·"}
-          </span>
+          {channel.thumbnail ? (
+            <img
+              src={channel.thumbnail}
+              alt=""
+              className="w-9 h-9 rounded-full object-cover shrink-0"
+            />
+          ) : (
+            <span
+              className="w-9 h-9 rounded-full flex items-center justify-center text-[14px] font-display text-ink-50 shrink-0"
+              style={{ background: accent }}
+              aria-hidden
+            >
+              {channel.name[0] || "·"}
+            </span>
+          )}
           <div className="min-w-0">
             <p className="text-eyebrow text-ink-400 mb-1">Persona Workspace</p>
             <h1 className="font-display text-[28px] lg:text-[32px] text-ink-800 tracking-[-0.025em] truncate">
