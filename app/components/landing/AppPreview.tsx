@@ -1,20 +1,53 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
 import {
-  Sparkles,
   ArrowRight,
+  ArrowDown,
   Heart,
   MessageCircle,
   Repeat2,
   Send,
   MoreHorizontal,
   CheckCircle2,
-  Pencil,
-  Trash2,
 } from "lucide-react";
 
-const TOPIC = "에스프레소 머신 없이 필터커피만 고집한 5년, 느림이 무기가 된 이야기";
+// 왼쪽 패널 단계 카드용 헬퍼
+function StepBadge({ n }: { n: string }) {
+  return (
+    <span className="w-6 h-6 rounded-full bg-anima-600 text-paper text-[10.5px] font-semibold tabular-nums flex items-center justify-center shrink-0">
+      {n}
+    </span>
+  );
+}
+
+function AnalysisRow({
+  label,
+  value,
+  danger,
+}: {
+  label: string;
+  value: string;
+  danger?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-[8px] border px-2.5 py-1.5 ${
+        danger
+          ? "border-[rgba(181,86,74,0.25)] bg-[rgba(181,86,74,0.05)]"
+          : "border-anima-200 bg-anima-50/40"
+      }`}
+    >
+      <p
+        className={`text-[9px] font-semibold tracking-[0.06em] uppercase mb-0.5 ${
+          danger ? "text-[#9c4a3f]" : "text-anima-700"
+        }`}
+      >
+        {label}
+      </p>
+      <p className="text-[11px] text-ink-700 leading-snug break-keep">
+        {value}
+      </p>
+    </div>
+  );
+}
 
 const POSTS = [
   {
@@ -71,43 +104,6 @@ const REPLIES = [
    ============================================================ */
 
 export function AppPreview() {
-  const [page, setPage] = useState(0); // 0 = Anima, 1 = Threads
-  const isPausedRef = useRef(false);
-  const startXRef = useRef<number | null>(null);
-
-  // Auto-advance on mobile
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      if (isPausedRef.current) return;
-      setPage((p) => (p + 1) % 2);
-    }, 5000);
-    return () => window.clearInterval(id);
-  }, []);
-
-  // Swipe handling — transform-based carousel
-  const onTouchStart = (e: React.TouchEvent) => {
-    isPausedRef.current = true;
-    startXRef.current = e.touches[0].clientX;
-  };
-
-  const onTouchEnd = (e: React.TouchEvent) => {
-    const startX = startXRef.current;
-    startXRef.current = null;
-    if (startX !== null) {
-      const endX = e.changedTouches[0].clientX;
-      const delta = endX - startX;
-      const threshold = 50; // px
-      if (Math.abs(delta) > threshold) {
-        if (delta < 0 && page === 0) setPage(1);
-        else if (delta > 0 && page === 1) setPage(0);
-      }
-    }
-    // Resume auto-advance after a pause
-    window.setTimeout(() => {
-      isPausedRef.current = false;
-    }, 4000);
-  };
-
   return (
     <>
       {/* Desktop — side by side */}
@@ -117,59 +113,18 @@ export function AppPreview() {
         <ThreadsSide />
       </div>
 
-      {/* Mobile — transform carousel */}
+      {/* Mobile — vertical stack (위→아래로 내려감) */}
       <div className="lg:hidden">
-        <div
-          className="overflow-hidden"
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-        >
-          <div
-            className="flex transition-transform duration-500 ease-out"
-            style={{ transform: `translateX(-${page * 100}%)` }}
-          >
-            <div className="shrink-0 w-full px-px">
-              <AnimaSide />
-            </div>
-            <div className="shrink-0 w-full px-px">
-              <ThreadsSide />
-            </div>
-          </div>
-        </div>
+        <p className="mb-2.5 text-center text-[11px] text-anima-700 font-medium tracking-[0.04em]">
+          ① 브랜드 페르소나를 설계하면
+        </p>
+        <AnimaSide />
 
-        {/* Dots + label */}
-        <div className="mt-5 flex items-center justify-center gap-3">
-          <button
-            onClick={() => {
-              isPausedRef.current = true;
-              setPage(0);
-              window.setTimeout(() => {
-                isPausedRef.current = false;
-              }, 4000);
-            }}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              page === 0 ? "w-6 bg-ink-800" : "w-1.5 bg-ink-300"
-            }`}
-            aria-label="Anima 화면"
-          />
-          <button
-            onClick={() => {
-              isPausedRef.current = true;
-              setPage(1);
-              window.setTimeout(() => {
-                isPausedRef.current = false;
-              }, 4000);
-            }}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              page === 1 ? "w-6 bg-ink-800" : "w-1.5 bg-ink-300"
-            }`}
-            aria-label="Threads 화면"
-          />
-        </div>
-        <p className="mt-3 text-center text-[11px] text-ink-400 tracking-[0.04em]">
-          {page === 0
-            ? "Anima에서 만들고"
-            : "Threads에서 반응을 받습니다"}
+        <VerticalConnector />
+
+        <ThreadsSide />
+        <p className="mt-2.5 text-center text-[11px] text-anima-700 font-medium tracking-[0.04em]">
+          ② Threads 콘텐츠로 완성됩니다
         </p>
       </div>
     </>
@@ -179,6 +134,22 @@ export function AppPreview() {
 /* ============================================================
    Connector
    ============================================================ */
+
+function VerticalConnector() {
+  return (
+    <div className="flex flex-col items-center gap-2 py-4">
+      <span className="text-[9.5px] tracking-[0.12em] uppercase text-ink-400 font-medium">
+        publish
+      </span>
+      <span
+        className="w-9 h-9 rounded-full border border-ink-200 bg-paper flex items-center justify-center text-ink-700"
+        style={{ boxShadow: "0 4px 12px rgba(11, 10, 7, 0.06)" }}
+      >
+        <ArrowDown size={15} strokeWidth={1.75} />
+      </span>
+    </div>
+  );
+}
 
 function Connector() {
   return (
@@ -213,92 +184,67 @@ function AnimaSide() {
           "0 24px 60px rgba(11, 10, 7, 0.08), 0 8px 16px rgba(11, 10, 7, 0.04)",
       }}
     >
-      {/* Window chrome */}
-      <div className="h-9 border-b border-ink-200/60 bg-ink-50 flex items-center px-4 gap-1.5">
-        <span className="w-2.5 h-2.5 rounded-full bg-ink-200" />
-        <span className="w-2.5 h-2.5 rounded-full bg-ink-200" />
-        <span className="w-2.5 h-2.5 rounded-full bg-ink-200" />
-        <span className="ml-4 text-[11px] text-ink-400 tracking-[0.02em] truncate">
-          anima.studio / 누크 커피
-        </span>
-      </div>
-
-      <div className="p-5 lg:p-6 min-w-0">
-        {/* Persona row */}
-        <div className="flex items-center gap-2.5 mb-5">
-          <span
-            className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-display text-ink-50 shrink-0"
-            style={{ background: "#7a8b6d" }}
-          >
-            N
-          </span>
-          <div className="min-w-0">
-            <p className="text-[12.5px] font-medium text-ink-800 leading-tight">
-              누크 커피
-            </p>
-            <p className="text-[10.5px] text-ink-400 leading-tight mt-0.5">
-              가게 페르소나 · Thread
-            </p>
+      <div className="p-5 lg:p-6 min-w-0 text-center">
+        {/* 01 기본 정보 */}
+        <div>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <StepBadge n="01" />
+            <p className="text-[13px] font-semibold text-ink-800">기본 정보</p>
           </div>
-          <div className="ml-auto flex items-center gap-1 text-[10px] text-anima-700">
-            <Sparkles size={11} strokeWidth={1.75} />
-            <span className="font-medium">생성됨</span>
+          <div className="space-y-1.5">
+            <AnalysisRow label="브랜드" value="누크 커피 · 성수동 필터커피" />
+            <AnalysisRow
+              label="한 줄 소개"
+              value="에스프레소 머신 없이 천천히 내리는 필터커피"
+            />
           </div>
         </div>
 
-        {/* Topic */}
-        <div className="border border-ink-200 rounded-[10px] p-3 mb-3 bg-ink-50/50">
-          <p className="text-[10px] text-ink-400 tracking-[0.12em] uppercase mb-1">
-            주제
-          </p>
-          <p className="text-[12.5px] text-ink-700 leading-snug">{TOPIC}</p>
+        {/* 02 성격과 말투 */}
+        <div className="mt-4 pt-4 border-t border-ink-200/60">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <StepBadge n="02" />
+            <p className="text-[13px] font-semibold text-ink-800">성격과 말투</p>
+          </div>
+          <div className="space-y-1.5">
+            <AnalysisRow
+              label="자주 쓰는 패턴"
+              value={'"~했어 · ~잖아" · "근데 신기한 건"'}
+            />
+            <AnalysisRow
+              label="지양 표현"
+              value={'광고체 "~하세요!" · 번역체'}
+              danger
+            />
+          </div>
         </div>
 
-        {/* Posts */}
-        <ol className="space-y-2">
-          {POSTS.map((p, i) => (
-            <li key={p.order}>
-              <article
-                className={`rounded-[10px] border p-3 ${
-                  i === 0
-                    ? "border-anima-300 bg-anima-50/40"
-                    : "border-ink-200 bg-paper"
-                }`}
-              >
-                <div className="flex items-start gap-2.5">
-                  <span className="font-mono text-[9.5px] text-ink-400 tabular-nums mt-0.5 shrink-0">
-                    0{p.order}
-                  </span>
-                  <p className="text-[11.5px] text-ink-700 leading-[1.6] whitespace-pre-line flex-1 min-w-0">
-                    {p.text}
-                  </p>
-                  <div className="flex flex-col gap-1 opacity-60 shrink-0">
-                    <Pencil
-                      size={10}
-                      strokeWidth={1.5}
-                      className="text-ink-400"
-                    />
-                    <Trash2
-                      size={10}
-                      strokeWidth={1.5}
-                      className="text-ink-400"
-                    />
-                  </div>
-                </div>
-              </article>
-            </li>
-          ))}
-        </ol>
+        {/* 생략 — 세로 점 */}
+        <div
+          className="my-4 flex flex-col items-center gap-1 animate-pulse"
+          aria-hidden
+        >
+          <span className="w-1 h-1 rounded-full bg-ink-300" />
+          <span className="w-1 h-1 rounded-full bg-ink-300" />
+          <span className="w-1 h-1 rounded-full bg-ink-300" />
+        </div>
 
-        {/* Footer */}
-        <div className="mt-4 pt-3 border-t border-ink-200/60 flex items-center justify-between">
-          <p className="text-[10.5px] text-ink-400 leading-tight">
-            누크 커피 페르소나의 톤으로 작성됨
-          </p>
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-ink-800 text-ink-50 text-[10.5px] font-medium">
-            <Send size={10} strokeWidth={1.75} />
-            발행하기
-          </span>
+        {/* 08 콘텐츠 방향 */}
+        <div className="mt-4 pt-4 border-t border-ink-200/60">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <StepBadge n="08" />
+            <p className="text-[13px] font-semibold text-ink-800">콘텐츠 방향</p>
+          </div>
+          <div className="space-y-1.5">
+            <AnalysisRow
+              label="주요 소재"
+              value="필터커피 고집하는 이유 · 운영 시행착오 · 단골과의 일상"
+            />
+            <AnalysisRow
+              label="핵심 메시지"
+              value="효율에 쫓기지 말고, 우리만의 속도로"
+            />
+          </div>
         </div>
       </div>
     </div>

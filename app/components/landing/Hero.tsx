@@ -26,35 +26,47 @@ export function Hero() {
             </span>
           </span>
 
-          <h1
-            className="font-display text-ink-800 mb-6 break-keep"
-            style={{
-              fontSize: "clamp(36px, 5.5vw, 64px)",
-              lineHeight: 1.25,
-              letterSpacing: "-0.035em",
-              fontWeight: 400,
-            }}
-          >
-            페르소나 설계부터 기획까지,
-            <br />
-            <span className="italic font-light text-ink-700">
-              가장 완벽한 브랜드 콘텐츠 스튜디오
-            </span>
-            <span className="text-anima-400">.</span>
-          </h1>
+          <div className="mb-7">
+            <p
+              className="font-display text-ink-700 break-keep mb-4"
+              style={{
+                fontSize: "clamp(19px, 2.4vw, 28px)",
+                lineHeight: 1.3,
+                letterSpacing: "-0.02em",
+                fontWeight: 400,
+              }}
+            >
+              페르소나 설계부터 기획까지,
+            </p>
+            <h1
+              className="font-display text-ink-900 break-keep"
+              style={{
+                fontSize: "clamp(34px, 5.4vw, 60px)",
+                lineHeight: 1.16,
+                letterSpacing: "-0.038em",
+                fontWeight: 600,
+              }}
+            >
+              가장 완벽한
+              <br />
+              브랜드 콘텐츠 스튜디오
+            </h1>
+          </div>
 
-          <div className="max-w-[600px] text-[15px] sm:text-[16px] text-ink-500 leading-[1.8] mb-10 break-keep">
+          <div className="max-w-[600px] text-[15px] sm:text-[16px] text-ink-500 leading-[1.85] mb-10 break-keep">
             <p>
-              수백만 원 브랜딩 컨설팅 없이도{" "}
+              비싼 브랜딩 컨설팅 없이도{" "}
               <br className="sm:hidden" />
               <span className="text-ink-700 font-medium">
-                우리 브랜드만의 고유한 색깔
+                우리 브랜드만의 고유한 색
               </span>
-              을 구축합니다.
+              을 만들고
             </p>
-            <p className="mt-2.5">
-              <span className="text-ink-700 font-medium">단어 몇 개</span>만으로
-              톤앤매너가 살아있는 스레드·SNS 콘텐츠를 기획하고 완성해 보세요.
+            <p className="mt-1.5">
+              톤앤매너가 살아있는{" "}
+              <span className="text-ink-700 font-medium">
+                콘텐츠를 빠르게 완성하세요.
+              </span>
             </p>
           </div>
 
