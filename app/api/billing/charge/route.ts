@@ -28,7 +28,7 @@ interface ChargeOutcome {
   reason?: string;
 }
 
-export async function POST(req: NextRequest) {
+async function handler(req: NextRequest): Promise<NextResponse> {
   const expected = process.env.CRON_SECRET;
   if (!expected) {
     return NextResponse.json(
@@ -210,3 +210,7 @@ export async function POST(req: NextRequest) {
     outcomes,
   });
 }
+
+// Vercel Cron sends GET; manual/internal callers may use POST.
+export const GET = handler;
+export const POST = handler;

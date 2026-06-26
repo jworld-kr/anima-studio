@@ -114,8 +114,9 @@ export function PlanPickerModal({
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-6">
           <p className="text-[13.5px] text-ink-500 leading-[1.7] mb-6">
-            플랜은 매월 잉크와 페르소나 한도를 함께 제공합니다. 1개월
-            이용권 방식으로, 기간이 끝나면 다시 결제해 연장할 수 있습니다.
+            플랜은 매월 잉크와 페르소나 한도를 함께 제공합니다. 카드를 한
+            번 등록하면 매월 같은 날 자동으로 결제됩니다. 언제든 해지할 수
+            있습니다.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -233,7 +234,7 @@ export function PlanPickerModal({
                       </Button>
                     ) : (
                       <Link
-                        href={`/test-checkout/${p.id}`}
+                        href={`/checkout/${p.id}`}
                         onClick={onClose}
                         className="inline-flex"
                       >
@@ -255,8 +256,8 @@ export function PlanPickerModal({
           </div>
 
           <p className="mt-6 text-[11.5px] text-ink-400 leading-[1.6] text-center">
-            모든 결제는 토스페이먼츠로 안전하게 처리됩니다. 1개월 단위
-            결제로 자동 청구되지 않습니다.
+            모든 결제는 토스페이먼츠로 안전하게 처리됩니다. 카드 정보는
+            Anima 서버에 저장되지 않으며, 언제든 해지할 수 있습니다.
           </p>
         </div>
       </div>
