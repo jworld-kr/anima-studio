@@ -1,0 +1,19 @@
+name: Monthly Billing Charge
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 매일 02:00 UTC
+  workflow_dispatch:       # 수동 실행 버튼
+
+jobs:
+  charge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run billing charge
+        run: |
+          curl -s -X POST https://anima-oursmartlife.kr/api/billing/charge \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            --fail \
+            --show-error
