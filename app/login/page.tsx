@@ -258,31 +258,49 @@ export default function LoginPage() {
             }}
           />
           <div className="relative max-w-[420px]">
-            <Logo
-              variant="block"
-              size={26}
-              tagline="페르소나 기반 콘텐츠 스튜디오."
-              forLabel="for Thread"
-              className="mb-10"
-            />
+            <span className="text-eyebrow text-anima-600 mb-6 inline-flex items-center gap-2">
+              Persona Content Studio
+              <span className="w-1 h-1 rounded-full bg-anima-400/60" aria-hidden />
+              <span className="text-ink-400 italic normal-case tracking-[0.04em]">
+                for Thread
+              </span>
+            </span>
             <p
-              className="font-display text-ink-800 mb-8"
+              className="font-display text-ink-700 mt-6 mb-4"
               style={{
-                fontSize: "clamp(26px, 2.8vw, 34px)",
-                lineHeight: 1.2,
-                letterSpacing: "-0.03em",
+                fontSize: "clamp(16px, 1.6vw, 20px)",
+                lineHeight: 1.3,
+                letterSpacing: "-0.02em",
                 fontWeight: 400,
               }}
             >
-              로고는 브랜드의 얼굴이고,{" "}
-              <span className="italic font-light text-ink-700">
-                페르소나는 그 목소리입니다.
-              </span>
+              페르소나 설계부터 기획까지,
+            </p>
+            <p
+              className="font-display text-ink-900 mb-8"
+              style={{
+                fontSize: "clamp(26px, 2.8vw, 36px)",
+                lineHeight: 1.16,
+                letterSpacing: "-0.038em",
+                fontWeight: 600,
+              }}
+            >
+              가장 완벽한
+              <br />
+              브랜드 콘텐츠 스튜디오
             </p>
             <div className="h-px bg-ink-200 mb-6 w-12" />
-            <p className="text-[13.5px] text-ink-500 leading-[1.7]">
-              Anima는 브랜드에 페르소나를 입히고,
-              <br />그 페르소나의 입으로 콘텐츠를 만듭니다.
+            <p className="text-[13.5px] text-ink-500 leading-[1.75]">
+              비싼 브랜딩 컨설팅 없이도{" "}
+              <span className="text-ink-700 font-medium">
+                우리 브랜드만의 고유한 색
+              </span>
+              을 만들고,
+              <br />
+              톤앤매너가 살아있는{" "}
+              <span className="text-ink-700 font-medium">
+                콘텐츠를 빠르게 완성하세요.
+              </span>
             </p>
           </div>
         </aside>
