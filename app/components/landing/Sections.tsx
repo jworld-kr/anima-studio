@@ -1397,8 +1397,8 @@ export function Pricing() {
 
         {/* Footnote */}
         <p className="mt-12 text-center text-[12px] text-ink-400 leading-[1.6]">
-          모든 결제는 토스페이먼츠로 안전하게 처리됩니다. 1개월 단위 결제로
-          자동 청구되지 않습니다.
+          모든 결제는 토스페이먼츠로 안전하게 처리됩니다. 카드를 한 번
+          등록하면 매월 자동으로 결제되며, 언제든 해지할 수 있습니다.
         </p>
       </div>
     </section>
