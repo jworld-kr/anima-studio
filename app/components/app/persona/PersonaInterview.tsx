@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState, Fragment } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Sparkles, Check, User2, Building2 } from "lucide-react";
 import { supabase } from "@/app/lib/supabase";
 import { Button } from "@/app/components/ui/Button";
 import { Input, Textarea } from "@/app/components/ui/Input";
-import { Skeleton } from "@/app/components/ui/Skeleton";
 import {
   SURVEY_STEPS,
   SURVEY_QUESTIONS,
@@ -13,24 +12,10 @@ import {
   SurveyAnswer,
   SurveyMode,
   SurveyQuestion,
-  MultiChoiceQuestion,
   TextQuestion,
   isAnswered,
 } from "@/app/lib/persona-interview";
 import type { WorldBuilding } from "@/app/types";
-
-/** assistNote의 **굵게** 구간을 <strong>으로, 나머지는 그대로 렌더 (줄바꿈은 whitespace-pre-line이 처리). */
-function renderAssistNote(text: string) {
-  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
-    part.startsWith("**") && part.endsWith("**") ? (
-      <strong key={i} className="font-semibold text-anima-700">
-        {part.slice(2, -2)}
-      </strong>
-    ) : (
-      <Fragment key={i}>{part}</Fragment>
-    )
-  );
-}
 
 interface Props {
   onComplete: (result: {
@@ -42,8 +27,7 @@ interface Props {
 
 function emptyAnswer(q: SurveyQuestion): SurveyAnswer {
   if (q.kind === "mode") return { id: q.id, kind: "mode", value: "person" };
-  if (q.kind === "text") return { id: q.id, kind: "text", value: "" };
-  return { id: q.id, kind: q.kind, selected: [], custom: "" };
+  return { id: q.id, kind: "text", value: "" };
 }
 
 export function PersonaInterview({ onComplete, onBack }: Props) {
@@ -65,7 +49,9 @@ export function PersonaInterview({ onComplete, onBack }: Props) {
     .map((id) => SURVEY_QUESTIONS[id])
     .filter(Boolean);
 
-  // Validation for this step — all non-optional questions must be answered.
+  const mode: SurveyMode =
+    answers.mode?.kind === "mode" ? answers.mode.value : "person";
+
   const stepValid = useMemo(() => {
     return stepQuestions.every((q) => {
       if ((q as any).optional) return true;
@@ -90,7 +76,6 @@ export function PersonaInterview({ onComplete, onBack }: Props) {
       return;
     }
 
-    // Synthesize
     setSynthesizing(true);
     setError("");
     try {
@@ -162,9 +147,9 @@ export function PersonaInterview({ onComplete, onBack }: Props) {
         </div>
       </div>
 
-      {/* Step content — keyed so each step animates in like a new turn */}
+      {/* Step content */}
       <div key={stepIdx} className="animate-page-turn">
-        {/* Anima narration — a speech bubble at section transitions */}
+        {/* Anima narration */}
         {step.description && (
           <div className="flex gap-3 mb-9">
             <span
@@ -191,11 +176,7 @@ export function PersonaInterview({ onComplete, onBack }: Props) {
               key={q.id}
               q={q}
               answer={answers[q.id]}
-              mode={
-                answers.mode?.kind === "mode"
-                  ? answers.mode.value
-                  : "person"
-              }
+              mode={mode}
               onChange={(next) => updateAnswer(q.id, next)}
             />
           ))}
@@ -252,6 +233,14 @@ function QuestionBlock({
   mode: SurveyMode;
   onChange: (a: SurveyAnswer) => void;
 }) {
+  const tq = q.kind === "text" ? (q as TextQuestion) : null;
+
+  const resolvedQuestion =
+    tq?.questionByMode?.[mode] ?? q.question;
+
+  const resolvedHint =
+    tq?.hintByMode?.[mode] ?? ("hint" in q ? q.hint : undefined);
+
   return (
     <div>
       <h3
@@ -263,67 +252,33 @@ function QuestionBlock({
           fontWeight: 500,
         }}
       >
-        {q.question}
+        {resolvedQuestion}
         {(q as any).optional && (
           <span className="ml-2 text-[11px] text-ink-400 font-normal tracking-normal">
             선택
           </span>
         )}
       </h3>
-      {("hint" in q && q.hint) && (
-        <p className="text-[13px] text-ink-500 leading-[1.65] mb-3 break-keep whitespace-pre-line">
-          {q.hint}
-        </p>
-      )}
 
-      {"assistNote" in q && (q as MultiChoiceQuestion).assistNote && (
-        <div className="mb-5 flex items-start gap-2.5 rounded-[10px] border border-anima-200 bg-anima-50/70 px-3.5 py-3">
-          <Sparkles
-            size={15}
-            strokeWidth={1.75}
-            className="text-anima-600 shrink-0 mt-0.5"
-          />
-          <p className="text-[12.5px] text-anima-700 leading-[1.7] break-keep whitespace-pre-line">
-            {renderAssistNote((q as MultiChoiceQuestion).assistNote!)}
-          </p>
-        </div>
+      {resolvedHint && (
+        <p className="text-[13px] text-ink-500 leading-[1.65] mb-4 break-keep whitespace-pre-line">
+          {resolvedHint}
+        </p>
       )}
 
       {q.kind === "mode" && (
         <ModeBlock
           value={(answer?.kind === "mode" ? answer.value : "person") as SurveyMode}
-          onChange={(v) =>
-            onChange({ id: q.id, kind: "mode", value: v })
-          }
+          onChange={(v) => onChange({ id: q.id, kind: "mode", value: v })}
         />
       )}
+
       {q.kind === "text" && (
         <TextBlock
           q={q as TextQuestion}
           mode={mode}
           value={answer?.kind === "text" ? answer.value : ""}
-          onChange={(v) =>
-            onChange({ id: q.id, kind: "text", value: v })
-          }
-        />
-      )}
-      {(q.kind === "single" || q.kind === "multi") && (
-        <ChoiceBlock
-          q={q as MultiChoiceQuestion}
-          selected={
-            answer?.kind === q.kind ? answer.selected : []
-          }
-          custom={
-            answer?.kind === q.kind ? answer.custom ?? "" : ""
-          }
-          onChange={(selected, custom) =>
-            onChange({
-              id: q.id,
-              kind: q.kind as "single" | "multi",
-              selected,
-              custom,
-            })
-          }
+          onChange={(v) => onChange({ id: q.id, kind: "text", value: v })}
         />
       )}
     </div>
@@ -338,21 +293,25 @@ function ModeBlock({
   value: SurveyMode;
   onChange: (v: SurveyMode) => void;
 }) {
-  const opts: { id: SurveyMode; label: string; desc: string; icon: typeof User2 }[] =
-    [
-      {
-        id: "person",
-        label: "개인 / 퍼스널 브랜딩",
-        desc: "인플루언서, 전문가, 크리에이터 등",
-        icon: User2,
-      },
-      {
-        id: "brand",
-        label: "브랜드 / 비즈니스",
-        desc: "F&B, 패션, 이커머스, 에이전시 등",
-        icon: Building2,
-      },
-    ];
+  const opts: {
+    id: SurveyMode;
+    label: string;
+    desc: string;
+    icon: typeof User2;
+  }[] = [
+    {
+      id: "person",
+      label: "개인 / 퍼스널 브랜딩",
+      desc: "인플루언서, 전문가, 크리에이터 등",
+      icon: User2,
+    },
+    {
+      id: "brand",
+      label: "브랜드 / 비즈니스",
+      desc: "F&B, 패션, 이커머스, 에이전시 등",
+      icon: Building2,
+    },
+  ];
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -411,39 +370,35 @@ function TextBlock({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const placeholder = q.placeholderByMode?.[mode] ?? q.placeholder ?? "";
   const branchedGroups = q.examplesByMode?.[mode];
 
   return (
     <div>
       {q.multiline ? (
         <Textarea
-          rows={3}
+          rows={4}
           value={value}
-          placeholder={q.placeholder ?? ""}
+          placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
         />
       ) : (
         <Input
           value={value}
-          placeholder={q.placeholder ?? ""}
+          placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
         />
       )}
 
-      {/* Mode-branched grouped examples take precedence. */}
       {branchedGroups && branchedGroups.length > 0 ? (
         <div className="mt-4 rounded-[10px] border border-ink-200 bg-ink-50/50 p-4 space-y-3">
-          <p
-            className={
-              q.exampleHeading
-                ? "text-[12px] font-medium text-ink-600"
-                : "text-[10px] tracking-[0.08em] uppercase text-ink-400 font-medium"
-            }
-          >
-            {q.exampleHeading ?? `예시 — ${mode === "brand" ? "브랜드" : "1인 크리에이터"}`}
-          </p>
+          {q.exampleHeading && (
+            <p className="text-[12px] font-medium text-ink-600">
+              {q.exampleHeading}
+            </p>
+          )}
           {branchedGroups.map((group, gi) => (
-            <div key={`${gi}-${group.label}`}>
+            <div key={gi}>
               {group.label && (
                 <p className="text-[11.5px] text-ink-500 font-medium mb-1.5 flex items-center gap-1.5">
                   {group.emoji && <span>{group.emoji}</span>}
@@ -454,10 +409,10 @@ function TextBlock({
                 {group.items.map((ex, i) => (
                   <li
                     key={i}
-                    className="text-[12px] text-ink-600 leading-[1.55] flex gap-2"
+                    className="text-[12.5px] text-ink-600 leading-[1.65] flex gap-2"
                   >
-                    <span className="text-ink-300 shrink-0">—</span>
-                    <span>{ex}</span>
+                    <span className="text-ink-300 shrink-0 mt-px">—</span>
+                    <span className="break-keep">{ex}</span>
                   </li>
                 ))}
               </ul>
@@ -486,175 +441,12 @@ function TextBlock({
   );
 }
 
-/* ─────── Choice (single or multi with groups, + custom) ─────── */
-function ChoiceBlock({
-  q,
-  selected,
-  custom,
-  onChange,
-}: {
-  q: MultiChoiceQuestion;
-  selected: string[];
-  custom: string;
-  onChange: (selected: string[], custom: string) => void;
-}) {
-  const toggle = (opt: string) => {
-    if (q.kind === "single") {
-      onChange([opt], custom);
-      return;
-    }
-    if (selected.includes(opt)) {
-      onChange(selected.filter((s) => s !== opt), custom);
-    } else {
-      if (q.maxSelected && selected.length >= q.maxSelected) return;
-      onChange([...selected, opt], custom);
-    }
-  };
-
-  // Long-form single-select (e.g. role archetypes with descriptions) reads
-  // better as stacked rows than wrapped pills.
-  const isLongFormSingle =
-    q.kind === "single" &&
-    q.groups.some((g) => g.options.some((o) => o.length > 24));
-
-  if (isLongFormSingle) {
-    return (
-      <div className="space-y-2.5">
-        {q.groups.flatMap((group) =>
-          group.options.map((opt) => {
-            const active = selected.includes(opt);
-            // Split "🎨 큐레이터 (취향·철학형) — 설명" into title / description.
-            const [titlePart, ...descParts] = opt.split(" — ");
-            const desc = descParts.join(" — ");
-            return (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => toggle(opt)}
-                className={`w-full text-left px-4 py-3.5 rounded-[12px] border transition-colors break-keep flex items-start gap-3 ${
-                  active
-                    ? "border-ink-800 bg-ink-50 shadow-[0_1px_2px_rgba(11,10,7,0.05)]"
-                    : "border-ink-200 bg-paper hover:border-ink-300"
-                }`}
-              >
-                <span
-                  className={`mt-0.5 w-4 h-4 rounded-full border-[1.5px] shrink-0 flex items-center justify-center transition-colors ${
-                    active ? "border-ink-800" : "border-ink-300"
-                  }`}
-                  aria-hidden
-                >
-                  {active && (
-                    <span className="w-2 h-2 rounded-full bg-ink-800" />
-                  )}
-                </span>
-                <span className="min-w-0">
-                  <span
-                    className={`block text-[14px] font-semibold leading-[1.4] mb-0.5 ${
-                      active ? "text-ink-900" : "text-ink-800"
-                    }`}
-                  >
-                    {titlePart}
-                  </span>
-                  {desc && (
-                    <span className="block text-[12.5px] text-ink-500 leading-[1.6]">
-                      {desc}
-                    </span>
-                  )}
-                </span>
-              </button>
-            );
-          })
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      {q.groups.map((group) => (
-        <div key={group.label}>
-          {q.groups.length > 1 && (
-            <p className="text-[12px] tracking-[0.04em] text-ink-600 font-medium mb-3 flex items-center gap-1.5">
-              {group.emoji && <span>{group.emoji}</span>}
-              <span>{group.label}</span>
-            </p>
-          )}
-          <div className="flex flex-wrap gap-2">
-            {group.options.map((opt) => {
-              const active = selected.includes(opt);
-              return (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => toggle(opt)}
-                  className={`px-3.5 py-2 rounded-full border text-[13px] leading-[1.3] transition-colors ${
-                    active
-                      ? "border-ink-800 bg-ink-800 text-ink-50"
-                      : "border-ink-200 bg-paper text-ink-600 hover:border-ink-300 hover:text-ink-800"
-                  }`}
-                >
-                  {opt}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      ))}
-
-      {q.allowCustom && (
-        <div className="pt-2">
-          <label className="block text-[11.5px] tracking-[0.04em] text-ink-500 font-medium mb-2">
-            + 직접 추가
-          </label>
-          {q.customHint && (
-            <p className="text-[12px] text-ink-500 leading-[1.6] mb-2">
-              {q.customHint}
-            </p>
-          )}
-          <Textarea
-            rows={3}
-            value={custom}
-            placeholder="줄바꿈이나 쉼표로 구분해서 적어주세요."
-            onChange={(e) => onChange(selected, e.target.value)}
-          />
-          {q.customExamples && q.customExamples.length > 0 && (
-            <div className="mt-2.5 rounded-[10px] border border-ink-200 bg-ink-50/50 p-3">
-              <p className="text-[10px] tracking-[0.08em] uppercase text-ink-400 mb-1.5 font-medium">
-                이런 식으로 적으시면 좋아요
-              </p>
-              <ul className="space-y-1">
-                {q.customExamples.map((ex, i) => (
-                  <li
-                    key={i}
-                    className="text-[12px] text-ink-600 leading-[1.55] flex gap-2"
-                  >
-                    <span className="text-ink-300 shrink-0">—</span>
-                    <span>{ex}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
-
-      {q.kind === "multi" && (q.maxSelected || q.minSelected) && (
-        <p className="text-[11px] text-ink-400 mt-2 tabular-nums">
-          {selected.length}개 선택됨
-          {q.minSelected ? ` · 최소 ${q.minSelected}개` : ""}
-          {q.maxSelected ? ` · 최대 ${q.maxSelected}개` : ""}
-        </p>
-      )}
-    </div>
-  );
-}
-
 /* ─────── Synthesizing screen ─────── */
 const SYNTH_ROLLING = [
-  "⚙️ 선택하신 성격 조각과 단어 파편을 입체적으로 조합하는 중…",
-  "🗣️ 스레드(Threads)에 가장 자연스럽게 녹아들 구어체 말투를 매핑하는 중…",
-  "🛡️ 피하고 싶은 모습을 분석해 브랜드 고유의 신념과 철학을 도출하는 중…",
-  "✍️ 오직 당신만을 위한 8개 레이어의 전담 에디터를 생성하는 중…",
+  "🔍 브랜드의 시작점과 창업 철학을 분석하는 중…",
+  "🎯 시장에서의 포지션과 차별점을 진단하는 중…",
+  "👤 타겟 독자의 상황과 갈망을 입체적으로 구성하는 중…",
+  "✍️ 브랜드만의 고유한 말투와 콘텐츠 방향을 완성하는 중…",
 ];
 
 function SynthesizingScreen() {
@@ -682,9 +474,9 @@ function SynthesizingScreen() {
           fontWeight: 400,
         }}
       >
-        Anima가 브랜드 정밀 진단 결과를
+        Anima가 브랜드를 진단하고
         <br />
-        분석하고 있습니다.
+        페르소나를 완성하는 중입니다.
       </h2>
       <p className="text-[13.5px] text-ink-400 leading-[1.7] mb-10">
         약 30초 정도 걸려요. 잠시만 기다려주세요.

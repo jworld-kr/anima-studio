@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
-import type { SurveyAnswer, SurveyAnswers } from "@/app/lib/persona-interview";
-import { SURVEY_QUESTIONS } from "@/app/lib/persona-interview";
+import type { SurveyAnswers } from "@/app/lib/persona-interview";
 import type { WorldBuilding } from "@/app/types";
 
 const client = new Anthropic({
@@ -26,76 +25,84 @@ async function getAuthedUser(req: NextRequest) {
   return user;
 }
 
-const SYSTEM_PROMPT = `당신은 페르소나 디자이너입니다. 사용자의 객관식 설문 답변을 받아 Anima의 페르소나 빌더 8섹션 JSON을 채웁니다.
+const SYSTEM_PROMPT = `당신은 스레드(Threads) 전문 브랜드 컨설턴트입니다. 사용자가 제출한 5가지 질문의 서술형 답변을 읽고, 브랜드를 깊이 분석해 Anima 페르소나 빌더 8섹션 JSON을 전문가 수준으로 완성합니다.
 
-중요 원칙:
-- 사용자가 고른 옵션과 자유 입력한 텍스트를 최대한 그대로 보존
-- 사용자가 직접 입력한 표현/성격이 있으면 그것을 우선
-- 만들어내지 말 것: 사용자가 안 말한 사실(이름, 직업, 나이 등) 절대 추가 금지
-- 스레드 기본 톤은 반말·구어체임을 전제로 합성 (~했습니다 같은 격식 종결 금지)
-- 성격(traits)은 사용자가 직접 고른 것과 자유입력을 그대로 나열. 임의 추가 금지
-- 자주 쓰는 표현(expressions)도 사용자가 고르거나 입력한 것이 있으면 그대로 나열하고 임의 추가 금지. 단, 사용자가 표현을 하나도 고르거나 입력하지 않아 비어 있을 때만, 이름·한 줄 소개·타겟·성격·역할을 분석해 이 페르소나가 실제로 자주 쓸 법한 스레드 구어체 말버릇·문구를 4~5개 만들어 채운다 (추상어 금지, 실제 사람이 쓰는 자연스러운 구어체로)
-- 추상어("진정성", "고급스러움") 사용 금지. 사용자가 고른 구체적 단어만 사용
-- 톤 슬라이더는 사용자 선택을 바탕으로 추론
-- 모드가 'person'이면 사람 페르소나, 'brand'면 브랜드 페르소나로 해석
+## 컨설턴트 원칙
 
-[예시 게시물(examples) 작성 시 한국어 규칙 — 반드시 준수]
-- 한 게시물 안에서 종결 톤(반말/존댓말)을 절대 섞지 말 것. 본문을 반말("~했어", "~임")로 시작했으면 마무리·행동 유도까지 끝까지 반말로 ("성수 오면 들러", "토요일까지만 있어"). 본문이 존댓말이면 끝까지 존댓말로.
-- 특히 마지막 행동 유도 문장에서 갑자기 "~요/~세요"로 바뀌는 일 금지. 본문과 같은 종결로 통일.
-- 고른 표현(expressions)은 문맥에 자연스럽게 맞을 때만 사용. 모든 글에 억지로 끼워넣지 말 것. 안 어울리면 그 글에서는 뺀다.
-- 한 문장이나 마무리에 의미가 충돌하는 표현을 겹쳐 쓰지 말 것. 글 전체가 하나의 자연스러운 의미 흐름으로 읽혀야 한다.
-- 줄표("—" "–" "ー") 절대 사용 금지. 영어 em dash 흔적이라 한국어 글에 어색함. 호흡은 마침표·쉼표·줄바꿈으로만.
-- 일반 하이픈("-")도 문장 안 호흡 끊기 용도로 쓰지 말 것.
-- 실제 한국어에서 안 쓰는 작가적 합성어 금지 (예: "연락 한 줄", "마음 한 자락", "시간 한 모금").
+1. 통찰 추출: 사용자의 답변에서 표면적 정보뿐 아니라 숨겨진 강점, 포지션, 철학을 읽어내라. 사용자가 명시하지 않아도 맥락에서 충분히 도출할 수 있다.
+2. 사실 추가 금지: 사용자가 언급하지 않은 구체적 수치, 이름, 직업, 사건은 절대 추가하지 말 것.
+3. 구체적 언어: 전문가의 시각으로 분석하되, 실제 사람이 쓰는 구체적이고 살아있는 표현으로 번역해 채울 것. "진정성", "고급스러움" 같은 추상어 금지.
+4. 스레드 톤 전제: 반말·구어체 기본. "~했습니다" 같은 격식 종결 금지.
+5. 모드 해석: mode가 'person'이면 개인 크리에이터/인플루언서, 'brand'이면 브랜드/비즈니스 계정으로 해석.
+
+## 각 답변에서 무엇을 추출할지
+
+- why (왜 시작했어?): 브랜드 창업 신화, 미션, 세계관 → world.background, world.values, contentDirection.message
+- difference (뭐가 달라?): 포지션, 차별점, 브랜드 고집 → personality.traits, personality.speechPattern, world.values
+- audience (서성거렸으면 하는 사람들): 타겟 독자의 상황·갈망·프로필 → targetAudience 전체
+- strength (밑천이 뭐야?): 콘텐츠 전문성, 주요 주제 영역 → contentDirection.mainTopics, world.interests, world.background
+- worst (절대 되기 싫은 느낌): 안티패턴, 금기, 브랜드 철학의 역 정의 → forbiddenThings, contentDirection.forbiddenTopics, personality.forbiddenWords
+
+## 표현(expressions) 처리
+
+반드시 전체 답변을 분석해 이 페르소나가 스레드에서 실제로 자주 쓸 법한 구어체 말버릇·문구를 4~5개 만들어 채울 것. 추상어 금지. 자연스러운 한국어 구어체.
+
+## 예시 게시물(examples) 작성 시 한국어 규칙
+
+- 반말/존댓말 절대 혼용 금지. 첫 문장 종결을 끝까지 유지.
+- 마지막 행동 유도 문장도 본문과 동일 종결체로 통일.
+- 줄표(— – ー) 절대 사용 금지.
+- 일반 하이픈(-)도 문장 내 호흡 끊기 목적 금지.
+- 실제 한국어에서 안 쓰는 작가적 합성어 금지. (예: "연락 한 줄", "마음 한 자락", "시간 한 모금")
 - 길이를 채우려 군더더기 묘사·반복·과한 감상 추가 금지. 짧고 정확한 글이 더 좋음.
 
 출력은 아래 스키마를 정확히 따르는 JSON 한 개만. 다른 텍스트·코드펜스·설명 절대 금지.
 
 {
   "basic": {
-    "name": "string (사용자가 입력한 이름)",
-    "age": number | null,
-    "job": "string (사람 모드: oneline에서 추출한 직함. 브랜드 모드: 분야 카테고리)",
-    "appearance": "string (선택. 사람이면 인상, 브랜드면 비주얼 인상)",
-    "oneline": "string (사용자가 입력한 한 줄 그대로 또는 다듬어서)"
+    "name": "string (name 답변의 이름. 없으면 fallbackName 사용)",
+    "age": null,
+    "job": "string (person: why+difference에서 역할/직함 추론. brand: 업종 카테고리)",
+    "appearance": "string (선택. 브랜드 인상이나 비주얼 무드 한 줄. 정보 없으면 빈 문자열)",
+    "oneline": "string (why + difference 답변을 종합한 브랜드 포지셔닝 한 문장. 구어체로 자연스럽게)"
   },
   "personality": {
-    "traits": "string (사용자가 고른 성격 옵션 + 자유입력을 쉼표로 연결. 임의 추가 금지)",
-    "expressions": ["string", ...] (사용자가 고르거나 입력한 표현을 그대로 배열로. 사용자가 하나도 주지 않아 비어 있으면, 페르소나에 어울리는 자연스러운 스레드 구어체 말버릇·문구를 4~5개 만들어 채운다),
-    "speechPattern": "string (콘텐츠 역할 + 성격 답에서 도출. 스레드 반말·구어체 전제. 1~3문장)",
-    "forbiddenWords": ["string", ...] (anti 답과 사용자 자유입력에서 추출. 0~5개)
+    "traits": "string (difference + why + worst 답변에서 도출한 성격 키워드들을 쉼표로 연결. 임의 추가 금지)",
+    "expressions": ["string", ...],
+    "speechPattern": "string (why + difference + worst를 종합해 도출. 스레드 반말·구어체 전제. 1~3문장)",
+    "forbiddenWords": ["string", ...] (worst + difference에서 추출한 피해야 할 표현·톤. 0~5개)
   },
   "world": {
-    "background": "string (oneline + vertical 종합. 운영 맥락이나 활동 배경 1~2문장)",
-    "interests": ["string", ...] (vertical과 oneline에서 도출, 3~6개),
-    "values": "string (anti + role + traits 종합. '~을 위해 ~하지 않는다' 형식 권장, 1~2문장)",
-    "dailyRoutine": "string (정보 없으면 빈 문자열로 두기)"
+    "background": "string (why + strength 답변을 바탕으로 브랜드가 살아온 맥락·배경. 1~2문장)",
+    "interests": ["string", ...] (strength + difference 답변에서 도출한 핵심 관심 영역. 3~6개),
+    "values": "string (why + worst + difference 종합. 이 브랜드가 지키는 신념. '~을 위해 ~하지 않는다' 형식 권장. 1~2문장)",
+    "dailyRoutine": "string (정보 부족하면 빈 문자열)"
   },
   "contentDirection": {
-    "mainTopics": ["string", ...] (vertical·oneline·role을 결합해 이 페르소나가 다룰 주요 주제 4~7개를 구체적으로 도출),
-    "sellWhat": "string (브랜드 모드면 oneline에서 추출, 사람 모드면 빈 문자열)",
-    "message": "string (role + oneline + values에서 도출. 한 문장)",
-    "forbiddenTopics": ["string", ...] (taboo 자유입력 + anti에서 추출)
+    "mainTopics": ["string", ...] (strength + difference + why에서 도출한 주요 콘텐츠 주제 4~7개. 구체적으로),
+    "sellWhat": "string (brand 모드: strength + why에서 추출. person 모드: 빈 문자열)",
+    "message": "string (why + difference + audience 종합한 이 계정의 핵심 메시지. 한 문장)",
+    "forbiddenTopics": ["string", ...] (worst + difference에서 추출)
   },
   "targetAudience": {
-    "description": "string (age + gender + vertical 종합. 한 사람을 구체적으로 그리듯 2~3문장)",
-    "ageGroup": "string (age 답을 자연스럽게. 예: '30대 초반 직장인')",
-    "interests": "string (vertical을 풀어서 한 줄)",
-    "toneTip": "string (이 독자에게 통할 톤 한 줄)"
+    "description": "string (audience 답변을 바탕으로 타겟을 생생하게 2~3문장으로 묘사)",
+    "ageGroup": "string (audience 답변에서 추론. 자연스러운 표현으로)",
+    "interests": "string (audience + strength 답변 기반. 한 줄)",
+    "toneTip": "string (이 타겟에게 통할 말투와 접근법. 한 줄)"
   },
   "tone": {
-    "seriousness": 1~10 (traits의 진지함·담담함 정도),
-    "professionalism": 1~10 (role이 '든든한 멘토'·'위트 있는 리더'면 높게, '다정한 친구'·'이야기꾼'이면 낮게),
-    "formality": 1~10 (스레드는 기본 낮음. expressions에 자조·공감 많으면 더 낮게),
-    "depth": 1~10 (traits의 통찰력·본질·분석 계열이 많으면 높게, 가벼운 일상 위주면 낮게)
+    "seriousness": 1~10,
+    "professionalism": 1~10,
+    "formality": 1~10,
+    "depth": 1~10
   },
   "examples": [
     {
       "title": "string (선택)",
-      "content": "string (이 페르소나가 쓸 법한 스레드 게시물 2~3개. 사용자가 고른 traits·expressions를 반드시 반영. 스레드 톤(반말·구어체). 분량은 페르소나에 맞춰 짧게 던지거나 길게 풀거나 자유롭게. 줄표 금지)"
+      "content": "string (이 페르소나가 쓸 법한 스레드 게시물 2~3개. personality.traits와 expressions를 반영. 스레드 톤(반말·구어체). 줄표 금지)"
     }
   ],
-  "forbiddenThings": "string (anti + taboo 종합한 자유 형식 1~2문단)"
+  "forbiddenThings": "string (worst + difference 종합한 이 브랜드의 절대 금기. 1~2문단)"
 }`;
 
 function safeParse(text: string): unknown {
@@ -192,8 +199,11 @@ function normalize(raw: any, fallbackName: string): WorldBuilding {
           ? tone.professionalism
           : DEFAULT_TONE.professionalism,
       formality:
-        typeof tone.formality === "number" ? tone.formality : DEFAULT_TONE.formality,
-      depth: typeof tone.depth === "number" ? tone.depth : DEFAULT_TONE.depth,
+        typeof tone.formality === "number"
+          ? tone.formality
+          : DEFAULT_TONE.formality,
+      depth:
+        typeof tone.depth === "number" ? tone.depth : DEFAULT_TONE.depth,
     },
     examples: examples
       .map((e: any) => ({
@@ -206,16 +216,27 @@ function normalize(raw: any, fallbackName: string): WorldBuilding {
   };
 }
 
-function answerToText(id: string, a: SurveyAnswer | undefined): string {
+function answerText(a: any): string {
   if (!a) return "(답변 없음)";
-  if (a.kind === "mode") return a.value;
-  if (a.kind === "text") return a.value.trim() || "(비워둠)";
-  const sel = a.selected.join(", ");
-  const cu = a.custom?.trim();
-  if (sel && cu) return `${sel} | 직접 입력: ${cu}`;
-  if (sel) return sel;
-  if (cu) return `직접 입력: ${cu}`;
-  return "(선택 없음)";
+  if (a.kind === "mode") return a.value === "brand" ? "브랜드/비즈니스" : "개인/크리에이터";
+  if (a.kind === "text") return a.value?.trim() || "(비워둠)";
+  return "(답변 없음)";
+}
+
+const QID_ORDER = ["mode", "name", "why", "difference", "audience", "strength", "worst"] as const;
+
+function resolveLabel(id: string, mode: string): string {
+  const isBrand = mode === "brand";
+  switch (id) {
+    case "mode":       return "모드";
+    case "name":       return isBrand ? "브랜드 이름" : "계정 이름";
+    case "why":        return isBrand ? "이 브랜드, 왜 시작했어?" : "이 계정, 왜 시작했어?";
+    case "difference": return isBrand ? "다른 브랜드들이랑 뭐가 달라?" : "다른 계정들이랑 뭐가 달라?";
+    case "audience":   return isBrand ? "서성거렸으면 하는 사람들 (브랜드 주변)" : "서성거렸으면 하는 사람들 (피드)";
+    case "strength":   return "제일 자신 있게 털어놓을 수 있는 밑천";
+    case "worst":      return isBrand ? "절대 되기 싫은 브랜드 느낌" : "절대 되기 싫은 계정 느낌";
+    default:           return id;
+  }
 }
 
 /**
@@ -237,20 +258,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "INVALID_BODY" }, { status: 400 });
   }
 
-  // Build a structured prompt from the survey schema + user answers.
+  const mode =
+    answers.mode?.kind === "mode" ? answers.mode.value : "person";
+
   const lines: string[] = [];
-  for (const [id, q] of Object.entries(SURVEY_QUESTIONS)) {
+  for (const id of QID_ORDER) {
     const a = answers[id];
-    const question =
-      q.kind === "mode" ? q.question : (q as any).question ?? id;
-    lines.push(`[${id}] ${question}\n→ ${answerToText(id, a)}`);
+    const label = resolveLabel(id, mode);
+    lines.push(`[${id}] ${label}\n→ ${answerText(a)}`);
   }
-  const userPrompt = `사용자의 설문 답변:\n\n${lines.join("\n\n")}\n\n위 답변을 바탕으로 페르소나 빌더 JSON을 생성하세요.`;
+
+  const userPrompt = `사용자 답변:\n\n${lines.join("\n\n")}\n\n위 답변을 바탕으로 브랜드를 전문가 시각으로 진단하고 페르소나 빌더 JSON을 완성하세요.`;
 
   try {
     const response = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 3500,
+      max_tokens: 4000,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userPrompt }],
     });
